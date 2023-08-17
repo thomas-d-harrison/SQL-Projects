@@ -1,0 +1,26 @@
+SET XACT_ABORT ON
+
+DECLARE @TranName VARCHAR(50) = 'UpdateWorkerSalary'
+BEGIN TRY
+BEGIN TRAN @TranName
+
+DECLARE @Rows INT = 1000, @BatchSize INT = 1000
+
+WHILE (@Rows = @BatchSize)
+BEGIN
+  UPDATE TOP(@BatchSize) Worker
+  SET SALARY = 140000
+  WHERE WORKER_ID = '1'
+
+  SET @Rows = @@ROWCOUNT
+END
+SAVE TRAN SavePoint1
+COMMIT TRAN @TranName
+END TRY
+
+BEGIN CATCH
+  
+ROLLBACK TRAN @TranName
+SELECT ERROR_MESSAGE()
+
+END CATCH
